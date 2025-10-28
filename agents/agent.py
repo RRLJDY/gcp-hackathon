@@ -1,6 +1,6 @@
 from google.adk.agents import LlmAgent, SequentialAgent
 
-GEMINI_MODEL = "gemini-2.5-pro"
+GEMINI_MODEL = "gemini-2.5-flash"
 
 # import prompts
 from agents.prompts.video_prompt import video_prompt
