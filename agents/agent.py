@@ -90,7 +90,6 @@ async def generate_image(prompt: str, tool_context: ToolContext) -> dict:
         return {
             "status": "success",
             "image_path": filepath,
-            "artifact_id": artifact.id,
             "prompt": prompt
         }
 
