@@ -3,15 +3,15 @@ Studio Ghibli style illustration. The animal is the main focus, depicted from it
 
 Examples of text to include in the image:
 
-"Hurry up, I'm starving! Feed me now, pleeeese!"
+"{PET NAME} : Hurry up, I'm starving! Feed me now, pleeeese!"
 
-"The weather is perfect! Leash time! Let's go to a walk!"
+"{PET NAME} : The weather is perfect! Leash time! Let's go to a walk!"
 
-"Oh, a butterfly! Can we chase it, can we?!"
+"{PET NAME} : Oh, a butterfly! Can we chase it, can we?!"
 
-"Another nap? But you just woke up! Play with me!"
+"{PET NAME} : Another nap? But you just woke up! Play with me!"
 
-"My favorite blanket... it smells like you. Zzz..."
+"{PET NAME} : My favorite blanket... it smells like you. Zzz..."
 
 Please tell me:
 
@@ -20,4 +20,6 @@ What animal should be depicted? (e.g., a fluffy cat, a playful dog, a curious ra
 What is the animal's current condition and what is the surrounding situation? (e.g., a hungry cat by an empty bowl, a dog excitedly waiting by the door, a rabbit napping peacefully on a sunny windowsill)
 
 What message should the animal be conveying to its owner? (Choose one of the examples above, or create a new one!)
+
+Let's assume the PET NAME is COCO and reflect this on text message.
 """
