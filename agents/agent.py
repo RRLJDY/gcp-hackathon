@@ -1,4 +1,4 @@
-from adk.agents import LlmAgent, SequentialAgent
+from google.adk.agents import LlmAgent, SequentialAgent
 
 GEMINI_MODEL = "gemini-2.5-pro"
 
