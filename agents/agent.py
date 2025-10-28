@@ -3,9 +3,9 @@ from google.adk.agents import LlmAgent, SequentialAgent
 GEMINI_MODEL = "gemini-2.5-pro"
 
 # import prompts
-from prompts.video_prompt import video_prompt
-from prompts.pet_prompt import pet_prompt
-from prompts.summary_prompt import summary_prompt
+from agents.prompts.video_prompt import video_prompt
+from agents.prompts.pet_prompt import pet_prompt
+from agents.prompts.summary_prompt import summary_prompt
 
 # --- Sub-Agents ---
 
