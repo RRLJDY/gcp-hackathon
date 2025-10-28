@@ -7,53 +7,70 @@ from agents.prompts.video_prompt import video_prompt
 from agents.prompts.pet_prompt import pet_prompt
 from agents.prompts.summary_prompt import summary_prompt
 
-from google.adk.tools import ToolContext
+import logging
+from pathlib import Path
+from datetime import datetime
+from google import genai
+from google.genai import types
 
-def generate_image(prompt: str, scene_number: int, tool_context: ToolContext):
-    """
-    gemini-2.5-flash-image 모델을 사용하여 텍스트로 이미지를 생성합니다.
-    """
-    try:
-        # 1. 이미지 생성 모델 선택
-        # 이 모델은 텍스트 프롬프트에 대해 이미지 데이터를 직접 반환합니다.
-        print(f"'{prompt_text}'에 대한 이미지 생성을 시작합니다...")
-        model = genai.GenerativeModel(model_name="gemini-2.5-flash-image")
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-        # 2. 이미지 생성 요청
-        response = model.generate_content(prompt_text)
+IMAGE_GENERATION_MODEL = "gemini-2.5-flash-image"
 
-        # 3. 응답에서 이미지 데이터 추출
-        # 응답의 'parts' 리스트에 이미지 데이터가 포함됩니다.
-        if response.parts:
-            # 첫 번째 part에서 'inline_data' (Blob)를 가져옵니다.
-            image_data = response.parts[0].inline_data
-            
-            # MIME 타입이 이미지인지 확인
-            if image_data.mime_type.startswith("image/"):
-                
-                # 4. PIL을 사용하여 이미지 데이터 열기
-                image_bytes = image_data.data
-                image = PIL.Image.open(io.BytesIO(image_bytes))
-                
-                # (선택 사항) Jupyter 노트북 등에서 이미지 바로 보기
-                # image.show() 
+def generate_image(prompt: str, output_dir: str = "generated_images") -> str:
+    """Generate an image using Gemini Image and return saved file path."""
+    # Ensure output directory exists
+    Path(output_dir).mkdir(parents=True, exist_ok=True)
 
-                # 5. 이미지 파일로 저장
-                output_filename = "generated_image.png"
-                image.save(output_filename)
-                print(f"성공! 이미지를 '{output_filename}' 파일로 저장했습니다.")
-                
-            else:
-                print(f"오류: 이미지 데이터가 아닌 응답을 받았습니다. (MIME: {image_data.mime_type})")
-        
-        else:
-            # 프롬프트가 안전 필터에 의해 거부되었거나 다른 문제가 발생한 경우
-            print(f"오류: 응답에 이미지 데이터가 없습니다.")
-            # 거부 사유 등을 확인하려면 'response.prompt_feedback'을 확인하세요.
-            print(f"응답 피드백: {response.prompt_feedback}")
+    # Initialize client with ADC (no explicit API key needed on GCP)
+    client = genai.Client()
 
-    except Exception as e:
-        print(f"이미지 생성 중 오류가 발생했습니다: {e}")
+    contents = [
+        types.Content(
+            role="user",
+            parts=[types.Part(text=prompt)]
+        )
+    ]
+
+    config = types.GenerateContentConfig(
+        temperature=1,
+        top_p=0.95,
+        max_output_tokens=32768,
+        response_modalities=["TEXT", "IMAGE"],
+        safety_settings=[
+            types.SafetySetting(category="HARM_CATEGORY_HATE_SPEECH", threshold="OFF"),
+            types.SafetySetting(category="HARM_CATEGORY_DANGEROUS_CONTENT", threshold="OFF"),
+            types.SafetySetting(category="HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold="OFF"),
+            types.SafetySetting(category="HARM_CATEGORY_HARASSMENT", threshold="OFF"),
+        ],
+    )
+
+    logger.info(f"Generating image with prompt: {prompt}")
+    response = client.models.generate_content(
+        model=IMAGE_GENERATION_MODEL,
+        contents=contents,
+        config=config,
+    )
+
+    image_bytes = None
+    # Extract first image part
+    candidate = response.candidates[0]
+    for part in candidate.content.parts:
+        if hasattr(part, 'inline_data') and part.inline_data:
+            image_bytes = part.inline_data.data
+            break
+
+    if not image_bytes:
+        raise RuntimeError("No image was generated in the response")
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filepath = Path(output_dir) / f"generated_image_{timestamp}.png"
+    with open(filepath, "wb") as f:
+        f.write(image_bytes)
+
+    logger.info(f"Image saved to: {filepath}")
+    return str(filepath)
 
 
 # --- Sub-Agents ---
@@ -79,7 +96,7 @@ summary_agent = Agent(
     model="gemini-2.5-flash",
     instruction=summary_prompt,
     description="Generates an image based on a one-line summary.",
-    output_key="generated_image",
+    output_key="image_path",
     tools=[generate_image],
 )
 
