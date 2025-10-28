@@ -1,3 +1,3 @@
-summary_prompt = """
-You are a summary agent. Given the video output JSON, create a one-line summary suitable for social media posting.
+summary_prompt = """A whimsical and enchanting Studio Ghibli style illustration of a beautiful Golden Retriever wearing a red harness. The dog is sitting alertly on a warm hardwood floor in front of a wooden main door, barking towards it. The scene is filled with soft, warm lighting from a nearby window, creating a cozy and detailed atmosphere reminiscent of a Ghibli film.
+Overlayed on the image is a mobile notification bubble with a paw print icon. The notification text reads: "[Alert!] I hear something outside the front door! Sitting here on guard duty. Come check it out! 🐾" "Must add" notification bubble
 """
